@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Project Test Suite",
+      "setup": "",
+      "run": "mvn test",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 3,
+      "points": null
+    }
+  ]
+}
