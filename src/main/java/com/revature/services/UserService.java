@@ -3,6 +3,8 @@ package com.revature.services;
 import com.revature.beans.User;
 import com.revature.dao.AccountDao;
 import com.revature.dao.UserDao;
+import com.revature.dao.UserDaoFile;
+import com.revature.exceptions.InvalidCredentialsException;
 
 /**
  * This class should contain the business logic for performing operations on users
@@ -23,7 +25,13 @@ public class UserService {
 	 * @return the User who is now logged in
 	 */
 	public User login(String username, String password) {
-		return null;
+		User user = userDao.getUser(username, password);
+		if (user == null) {
+			throw new InvalidCredentialsException();
+		} else {
+			return user;
+		}
+		
 	}
 	
 	/**
@@ -32,6 +40,6 @@ public class UserService {
 	 * @throws UsernameAlreadyExistsException if the given User's username is taken
 	 */
 	public void register(User newUser) {
-		
+		userDao.addUser(newUser);
 	}
 }

@@ -1,5 +1,9 @@
 package com.revature.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 import com.revature.beans.Account;
 import com.revature.beans.User;
 import com.revature.dao.AccountDao;
@@ -11,7 +15,7 @@ import com.revature.exceptions.OverdraftException;
 public class AccountService {
 	
 	public AccountDao actDao;
-	public static final double STARTING_BALANCE = 25d;
+	public static final double STARTING_BALANCE = 0.01;
 	
 	public AccountService(AccountDao dao) {
 		this.actDao = dao;
@@ -23,7 +27,20 @@ public class AccountService {
 	 * @throws UnsupportedOperationException if amount is negative
 	 */
 	public void withdraw(Account a, Double amount) {
+		if (!a.isApproved()) {
+			throw new UnsupportedOperationException();
+		}
 		
+		if (amount < 0) {
+			throw new UnsupportedOperationException();
+		} else {
+			Double balance = a.getBalance();
+			if (balance > amount) {
+				a.setBalance(balance - amount);
+			} else {
+				throw new OverdraftException();
+			}
+		}
 	}
 	
 	/**
@@ -33,6 +50,13 @@ public class AccountService {
 	public void deposit(Account a, Double amount) {
 		if (!a.isApproved()) {
 			throw new UnsupportedOperationException();
+		}
+		
+		if (amount < 0) {
+			throw new UnsupportedOperationException();
+		} else {
+			Double balance = a.getBalance();
+			a.setBalance(balance + amount);
 		}
 	}
 	
@@ -46,7 +70,25 @@ public class AccountService {
 	 * @param amount the monetary value to transfer
 	 */
 	public void transfer(Account fromAct, Account toAct, double amount) {
+		if (!fromAct.isApproved()) {
+			throw new UnsupportedOperationException();
+		}
+		if (!toAct.isApproved()) {
+			throw new UnsupportedOperationException();
+		}
+		if (amount < 0) {
+			throw new UnsupportedOperationException();
+		}
 		
+		Double fromActBal = fromAct.getBalance();
+		if (fromActBal < amount) {
+			throw new UnsupportedOperationException();
+		} else {
+			fromAct.setBalance(fromActBal - amount);
+			actDao.updateAccount(fromAct);
+			toAct.setBalance(toAct.getBalance() + amount);
+			actDao.updateAccount(toAct);
+		}
 	}
 	
 	/**
@@ -54,7 +96,16 @@ public class AccountService {
 	 * @return the Account object that was created
 	 */
 	public Account createNewAccount(User u) {
-		return null;
+		Account account = new Account();
+		account.setId(u.getId());
+		account.setBalance(0.01);
+		List<Account> acts = new ArrayList<Account>();
+		acts.add(account);
+		u.setAccounts(acts);
+		actDao.addAccount(account);
+		//System.out.println(account);
+		//System.out.println(acts);
+		return account;
 	}
 	
 	/**
@@ -65,6 +116,7 @@ public class AccountService {
 	 * @return true if account is approved, or false if unapproved
 	 */
 	public boolean approveOrRejectAccount(Account a, boolean approval) {
+		a.setApproved(true);
 		return false;
 	}
 }
