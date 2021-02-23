@@ -41,8 +41,12 @@ public class FileIntegrationTests extends PointWatcher {
 	
 	@BeforeClass
 	public static void setupFileLocations() {
-		UserDaoFile.fileLocation = "target/integrationTests/users";
-		AccountDaoFile.fileLocation = "target/integrationTests/accounts";
+		UserDaoFile.fileLocation = "users";
+		AccountDaoFile.fileLocation = "accounts";
+		//UserDaoFile.fileLocation = "C:\\Users\\Jennifer\\Documents\\GitRepos\\project-0---banking-app-JenniferKillian\\src\\test\\java\\users.txt";
+		//AccountDaoFile.fileLocation = "C:\\Users\\Jennifer\\Documents\\GitRepos\\project-0---banking-app-JenniferKillian\\src\\test\\java\\accounts.txt";
+		//UserDaoFile.fileLocation = "target/integrationTests/users"; //"C:\\Users\\Jennifer\\Documents\\GitRepo\\project-0---banking-app-ThomasJae\\src\\test\\java\\users.txt";
+		//AccountDaoFile.fileLocation = "target/integrationTests/accounts"; //"C:\\Users\\Jennifer\\Documents\\GitRepo\\project-0---banking-app-ThomasJae\\src\\test\\jave\\accounts.txt";
 	}
 	
 	/*
@@ -65,11 +69,13 @@ public class FileIntegrationTests extends PointWatcher {
 		testUser.setUsername("testUser");
 		testUser.setUserType(UserType.CUSTOMER);
 		udao.addUser(testUser);
+		
 	}
 	
 	@After
 	public void tearDown() throws IOException {
 		Files.delete(Paths.get(AccountDaoFile.fileLocation));
+		Files.delete(Paths.get(UserDaoFile.fileLocation));
 	}
 	
 	@Test
@@ -156,6 +162,7 @@ public class FileIntegrationTests extends PointWatcher {
 		second.setId(2);
 		second.setUsername("test2");
 		second.setPassword("someTestPassword");
+		udao.addUser(second);
 		List<User> allUsers = udao.getAllUsers();
 		assertEquals(allUsers.size(), 2);
 	}

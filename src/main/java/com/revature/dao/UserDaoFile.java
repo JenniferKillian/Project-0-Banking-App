@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.List;
+import com.revature.beans.*;
 
 import com.revature.beans.User;
 
@@ -19,99 +21,184 @@ import com.revature.beans.User;
  */
 public class UserDaoFile implements UserDao {
 	
-	public static String fileLocation = "Users.txt";
-
+	public static String fileLocation = "users";
+////////////////////////////////////////////////////////////////////////////////
 	public User addUser(User user) {
+		List<User> uList = getAllUsers();
+		uList.add(user);
+		
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileLocation));
-				oos.writeObject(user);
+				oos.writeObject(uList);
+				oos.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		return user;
 	}
-
+////////////////////////////////////////////////////////////////////////////////////
 	public User getUser(Integer userId) {
-		User u = new User();
+		List<User> allUsers = new ArrayList<User>();
+
 		try {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileLocation));
-
-			u = (User)ois.readObject();
-			
-			System.out.println(u);
+			allUsers = (ArrayList<User>)ois.readObject();
+			ois.close();
 			
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return u;
+		
+		
+		
+		for(User user : allUsers) {
+			int id = user.getId();
+			if (id == userId) {
+				return user;
+			}
+		}
+		
+		
+		return null;
 	}
-
+//////////////////////////////////////////////////////////////////////////////////////
 	public User getUser(String username, String pass) {
-		User u = new User();
+		List<User> allUsers = new ArrayList<User>();
+
 		try {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileLocation));
-
-			u = (User)ois.readObject();
-			
-			System.out.println(u);
+			allUsers = (ArrayList<User>)ois.readObject();
+			ois.close();
 			
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return u;
+		
+		
+		
+		for(User user : allUsers) {
+			String n = user.getUsername();
+			String p = user.getPassword();
+			if (n == username & p == pass) {
+				return user;
+			}
+		}
+		
+		
+		return null;
 	}
-
+/////////////////////////////////////////////////////////////////////////////////
 	public List<User> getAllUsers() {
 		
 		List<User> allUsers = new ArrayList<User>();
 		try {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileLocation));
-
+			
 			allUsers = (ArrayList<User>)ois.readObject();
-			for(User u: allUsers) {
-			System.out.println(u);
-			}
+			ois.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return allUsers;
 	}
-
+/////////////////////////////////////////////////////////////////////////////////////
 	public User updateUser(User u) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		List<User> allUsers = new ArrayList<User>();
 
+		try {
+			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileLocation));
+			allUsers = (ArrayList<User>)ois.readObject();
+			ois.close();
+			
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		for(User user : allUsers) {
+			int id = user.getId();
+			if (id == u.getId()) {
+				allUsers.remove(user);
+				allUsers.add(u);
+			}
+		}
+		
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileLocation));
+			oos.writeObject(allUsers);
+			oos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return u;
+	}
+///////////////////////////////////////////////////////////////////////////	
 	public boolean removeUser(User u) {
-		// TODO Auto-generated method stub
+		List<User> allUsers = new ArrayList<User>();
+		List<User> usersUpdate = new ArrayList<User>();
+
+		try {
+			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileLocation));
+			allUsers = (ArrayList<User>)ois.readObject();
+			ois.close();
+			
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		
+        for(User user : allUsers) {
+			int id = user.getId();
+			if (id != u.getId()) {
+				usersUpdate.add(user);
+			}
+		}
+		
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileLocation));
+			oos.writeObject(usersUpdate);
+			oos.close();
+			return true;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
