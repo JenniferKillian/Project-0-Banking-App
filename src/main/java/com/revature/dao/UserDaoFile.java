@@ -25,6 +25,7 @@ public class UserDaoFile implements UserDao {
 ////////////////////////////////////////////////////////////////////////////////
 	public User addUser(User user) {
 		List<User> uList = getAllUsers();
+		
 		uList.add(user);
 		
 			try {
