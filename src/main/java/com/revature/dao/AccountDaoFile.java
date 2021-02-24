@@ -136,13 +136,14 @@ public class AccountDaoFile implements AccountDao {
 			e.printStackTrace();
 		}
 		
+		List<Account> updatedAccounts = new ArrayList<Account>();
 		for(Account account : allAccounts) {
 			int id = account.getId();
-			if (id == a.getId()) {
-				allAccounts.remove(account);
-				allAccounts.add(a);
+			if (id != a.getId()) {
+				updatedAccounts.add(account);
 			}
 		}
+		updatedAccounts.add(a);
 		
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileLocation));

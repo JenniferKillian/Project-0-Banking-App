@@ -87,7 +87,6 @@ public class UserTests extends PointWatcher {
 		User anotherUser = new User();
 		anotherUser.setUsername(uname);
 		anotherUser.setPassword("testpassword");
-		//anotherUser.setPassword("anotherpassword");
 		userSrv.register(anotherUser);
 	}
 	

@@ -11,6 +11,14 @@ import com.revature.dao.UserDaoFile;
 public class BankApplicationDriver {
 
 	public static void main(String[] args) {
+		
+		/*
+		 * Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+    System.out.println("Enter username");
+
+    String userName = myObj.nextLine();  // Read user input
+    System.out.println("Username is: " + userName);
+		 */
 		//PrintMenu
 		System.out.println("Press 1 to log in.");
 		System.out.println("Press 2 to register new user.");

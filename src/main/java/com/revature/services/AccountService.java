@@ -1,13 +1,19 @@
 package com.revature.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.Optional;
 
 import com.revature.beans.Account;
+import com.revature.beans.Transaction;
 import com.revature.beans.User;
+import com.revature.beans.User.UserType;
+import com.revature.beans.Transaction.TransactionType;
 import com.revature.dao.AccountDao;
 import com.revature.exceptions.OverdraftException;
+import com.revature.exceptions.UnauthorizedException;
+import com.revature.utils.SessionCache;
 
 /**
  * This class should contain the business logic for performing operations on Accounts
@@ -37,6 +43,22 @@ public class AccountService {
 			Double balance = a.getBalance();
 			if (balance > amount) {
 				a.setBalance(balance - amount);
+				
+				Transaction t = new Transaction();
+				t.setType(TransactionType.WITHDRAWAL);
+				t.setAmount(amount);
+				t.setTimestamp();
+				
+				List<Transaction> transactions = new ArrayList<Transaction>();
+				
+				if (a.getTransactions() != null) {
+					transactions = a.getTransactions();
+				}
+				transactions.add(t);
+				
+				a.setTransactions(transactions);
+				actDao.updateAccount(a);
+				
 			} else {
 				throw new OverdraftException();
 			}
@@ -57,6 +79,20 @@ public class AccountService {
 		} else {
 			Double balance = a.getBalance();
 			a.setBalance(balance + amount);
+			
+			Transaction t = new Transaction();
+			t.setType(TransactionType.DEPOSIT);
+			t.setAmount(amount);
+			t.setTimestamp();
+			
+			List<Transaction> transactions = new ArrayList<Transaction>();
+			if (a.getTransactions() != null) {
+				transactions = a.getTransactions();
+			}
+			transactions.add(t);
+			
+			a.setTransactions(transactions);
+			actDao.updateAccount(a);
 		}
 	}
 	
@@ -85,8 +121,34 @@ public class AccountService {
 			throw new UnsupportedOperationException();
 		} else {
 			fromAct.setBalance(fromActBal - amount);
-			actDao.updateAccount(fromAct);
 			toAct.setBalance(toAct.getBalance() + amount);
+			
+			//Create transaction
+			Transaction t = new Transaction();
+			t.setSender(fromAct);
+			t.setRecipient(toAct);
+			t.setAmount(amount);
+			t.setTimestamp();
+			
+			//Create List of transactions. If account has transactions, store them in it
+			//and add the new transaction. If not, just add the new transaction.
+			List<Transaction> transactions = new ArrayList<Transaction>();
+			if (fromAct.getTransactions() != null) {
+				transactions = fromAct.getTransactions();
+			}
+			transactions.add(t);
+			
+			//Set the account transactions to the new List and update the account.
+			fromAct.setTransactions(transactions);
+			actDao.updateAccount(fromAct);
+			
+			//Do the same for the other account.
+			List<Transaction> transactions2 = new ArrayList<Transaction>();
+			if (toAct.getTransactions() != null) {
+				transactions2 = toAct.getTransactions();
+			}
+			transactions2.add(t);
+			toAct.setTransactions(transactions2);
 			actDao.updateAccount(toAct);
 		}
 	}
@@ -116,7 +178,19 @@ public class AccountService {
 	 * @return true if account is approved, or false if unapproved
 	 */
 	public boolean approveOrRejectAccount(Account a, boolean approval) {
-		a.setApproved(true);
-		return false;
+		Optional<User> u = SessionCache.getCurrentUser();
+		User user = new User();
+		user = u.get();
+		
+		if (user.getUserType() == UserType.CUSTOMER) {
+			
+			throw new UnauthorizedException();
+			
+		} else {
+			a.setApproved(true);
+			return true;
+		}
+		
+		
 	}
 }
