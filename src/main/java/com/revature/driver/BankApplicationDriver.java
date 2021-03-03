@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import com.revature.beans.User;
 import com.revature.dao.UserDao;
+import com.revature.dao.UserDaoDB;
 import com.revature.dao.UserDaoFile;
 import com.revature.services.UserService;
 import com.revature.utils.SessionCache;
@@ -33,7 +34,7 @@ public class BankApplicationDriver {
 			  String password = sc.nextLine();
 			  
 			  User user = new User();
-			  UserDaoFile udf = new UserDaoFile();
+			  UserDaoDB udf = new UserDaoDB();
 			  user = udf.getUser(username, password);
 			  if (user != null) {
 				  System.out.println("Successfully logged in.");
@@ -64,7 +65,7 @@ public class BankApplicationDriver {
 			  String password = sc.nextLine();
 			  newUser.setPassword(password);
 			  
-			  UserDaoFile udf = new UserDaoFile();
+			  UserDaoDB udf = new UserDaoDB();
 			  
 			  User registered = udf.addUser(newUser);
 			  if (registered != null) {

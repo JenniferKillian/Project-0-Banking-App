@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import com.revature.dao.UserDaoDB;
  * you run these tests on your machine. Don't forget to put it back again before you
  * push your code though.
  */
-@Ignore
+//@Ignore
 public class DatabaseIntegrationTests extends PointWatcher {
 	
 	AccountDao adao = new AccountDaoDB();
@@ -45,13 +46,6 @@ public class DatabaseIntegrationTests extends PointWatcher {
 	
 	@Before
 	public void setupAccountAndUser() {
-		toTest = new Account();
-		toTest.setId(1);
-		toTest.setOwnerId(1);
-		toTest.setType(AccountType.CHECKING);
-		toTest.setApproved(true);
-		toTest.setBalance(14.32);
-		adao.addAccount(toTest);
 		testUser.setFirstName("TestFIRST");
 		testUser.setLastName("TestLAST");
 		testUser.setId(1);
@@ -59,64 +53,18 @@ public class DatabaseIntegrationTests extends PointWatcher {
 		testUser.setUsername("testUser");
 		testUser.setUserType(UserType.CUSTOMER);
 		udao.addUser(testUser);
+		toTest.setId(1);
+		toTest.setOwnerId(1);
+		toTest.setType(AccountType.CHECKING);
+		toTest.setApproved(true);
+		toTest.setBalance(14.32);
+		adao.addAccount(toTest);
+		
 	}
 	
 	@After
 	public void tearDown() throws IOException {
-		adao.removeAccount(toTest);
-	}
-	
-	@Test
-	public void testAddAccount() {
-		Account fromDB = adao.getAccount(toTest.getId());
-		assertEquals(toTest, fromDB);
-	}
-	
-	@Test
-	public void testGetAllAccounts() {
-		Account secondAccount = new Account();
-		secondAccount.setId(2);
-		secondAccount.setOwnerId(1);
-		secondAccount.setType(AccountType.SAVINGS);
-		secondAccount.setApproved(false);
-		secondAccount.setBalance(32.10);
-		List<Account> all = adao.getAccounts();
-		assertEquals(all.size(), 2);
-	}
-	
-	@Test
-	public void testUpdateAccount() {
-		toTest.setApproved(false);
-		toTest.setBalance(45.87);
-		Account updated = adao.updateAccount(toTest);
-		assertEquals(toTest, updated);
-	}
-	
-	@Test
-	public void testDeleteAccount() {
-		boolean success = adao.removeAccount(toTest);
-		if (success) {
-			assertEquals(adao.getAccounts().size(), 0);
-		} else {
-			fail("Unable to delete account");
-		}
-	}
-	
-	@Test
-	public void testGetAccountsByUser() {
-		Account secondAccount = new Account();
-		secondAccount.setId(2);
-		secondAccount.setOwnerId(2);
-		secondAccount.setType(AccountType.SAVINGS);
-		secondAccount.setApproved(false);
-		secondAccount.setBalance(32.10);
-		adao.addAccount(secondAccount);
-		User u = new User();
-		u.setId(2);
-		// only secondAccount should be retrieved since it belongs to user 2
-		List<Account> test = adao.getAccountsByUser(u);
-		assertEquals(test.size(), 1);
-		assertEquals(secondAccount, test.get(0));
+		//adao.removeAccount(toTest);
 	}
 	
 	/*
@@ -135,8 +83,10 @@ public class DatabaseIntegrationTests extends PointWatcher {
 		second.setId(2);
 		second.setUsername("test2");
 		second.setPassword("someTestPassword");
+		udao.addUser(second);
 		List<User> allUsers = udao.getAllUsers();
 		assertEquals(allUsers.size(), 2);
+		udao.removeUser(second);
 	}
 	
 	@Test
@@ -144,17 +94,92 @@ public class DatabaseIntegrationTests extends PointWatcher {
 		testUser.setFirstName("Charlie");
 		udao.updateUser(testUser);
 		assertEquals(udao.getUser(testUser.getId()).getFirstName(), "Charlie");
+		testUser.setFirstName("TestFIRST");
+		udao.updateUser(testUser);
 	}
 	
 	@Test
 	public void testDeleteUser() {
+		udao.removeUser(testUser);
+		assertEquals(udao.getAllUsers().size(), 0);
+		/*
 		boolean success = udao.removeUser(testUser);
 		if (success) {
 			assertEquals(udao.getAllUsers().size(), 0);
 		} else {
 			fail("Unable to delete account");
-		}
+		}*/
 	}
+	
+	/*
+	 * Account Integration Tests
+	 */
+	
+	@Test
+	public void testAddAccount() {
+		Account fromDB = adao.getAccount(toTest.getId());
+		assertEquals(toTest, fromDB);
+	}
+	
+	@Test
+	public void testGetAllAccounts() {
+		Account secondAccount = new Account();
+		secondAccount.setId(2);
+		secondAccount.setOwnerId(1);
+		secondAccount.setType(AccountType.SAVINGS);
+		secondAccount.setApproved(false);
+		secondAccount.setBalance(32.10);
+		adao.addAccount(secondAccount);
+		List<Account> all = adao.getAccounts();
+		assertEquals(all.size(), 2);
+		adao.removeAccount(secondAccount);
+	}
+	
+	@Test
+	public void testUpdateAccount() {
+		toTest.setApproved(false);
+		toTest.setBalance(45.87);
+		Account updated = adao.updateAccount(toTest);
+		assertEquals(toTest, updated);
+		toTest.setApproved(true);
+		toTest.setBalance(14.32);
+		adao.updateAccount(toTest);
+	}
+	
+	@Test
+	public void testDeleteAccount() {
+		adao.removeAccount(toTest);
+		assertEquals(adao.getAccounts().size(), 0);
+		/*
+		boolean success = adao.removeAccount(toTest);
+		if (success) {
+			assertEquals(adao.getAccounts().size(), 0);
+		} else {
+			fail("Unable to delete account");
+		}*/
+	}
+	
+	@Test
+	public void testGetAccountsByUser() {
+		User u = new User();
+		u.setId(2);
+		udao.addUser(u);
+		Account secondAccount = new Account();
+		secondAccount.setId(2);
+		secondAccount.setOwnerId(2);
+		secondAccount.setType(AccountType.SAVINGS);
+		secondAccount.setApproved(false);
+		secondAccount.setBalance(32.10);
+		adao.addAccount(secondAccount);
+		
+		// only secondAccount should be retrieved since it belongs to user 2
+		List<Account> test = adao.getAccountsByUser(u);
+		assertEquals(test.size(), 1);
+		assertEquals(secondAccount, test.get(0));
+		udao.removeUser(u);
+	}
+	
+	
 	
 	/*
 	 * TRANSACTION INTEGRATION TESTS
@@ -170,9 +195,12 @@ public class DatabaseIntegrationTests extends PointWatcher {
 		t.setAmount(5d);
 		t.setTimestamp();
 		t.setType(TransactionType.TRANSFER);
-		toTest.setTransactions(Arrays.asList(t));
+		//toTest.setTransactions(Arrays.asList(t));
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		transactions.add(t);
+		toTest.setTransactions(transactions);
 		adao.updateAccount(toTest);
 		List<Transaction> list = tdao.getAllTransactions();
-		assertEquals(list.size(), 0);
+		assertEquals(list.size(), 1);
 	}
 }

@@ -1,1 +1,2 @@
 2021-02-24 17:52:43 DEBUG LogDriver:42 - Error in BankApplicationDriver user login failed
+2021-03-03 14:48:26 DEBUG LogDriver:84 - Error in BankApplicationDriver user login failed
